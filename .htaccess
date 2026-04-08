@@ -1,0 +1,24 @@
+RewriteEngine On
+RewriteBase /kolabkampus/
+
+# Hilangkan .php
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)$ $1.php [L]
+
+# Alias
+RewriteRule ^submit$ kirim_form.php [L]
+RewriteRule ^login$ login.php [L]
+RewriteRule ^logout$ logout [L]
+RewriteRule ^register$ register.php [L]
+RewriteRule ^index_pencari_modul$ index_pencari_modul.php [L]
+RewriteRule ^index$ index.php [L]
+RewriteRule ^reward_diskon$ reward_diskon.php [L]
+RewriteRule ^katalog_partner$ katalog_partner.php [L]
+RewriteRule ^daftar_invoice$ daftar_invoice [L]
+RewriteRule ^butat_invoice_shoficraft$ butat_invoice_shoficraft.php [L]
+RewriteRule ^ruangan_kosan_view_pencari_kos$ ruangan_kosan_view_pencari_kos.php [QSA,L]
+
+# Jika bukan file/folder, arahkan ke index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ landing_page.php [L]

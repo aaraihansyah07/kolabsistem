@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user_pengguna {
+  email                                                                       String                        @unique(map: "uq_email_user") @db.VarChar(100)
+  pword                                                                       String                        @db.VarChar(100)
+  fname                                                                       String                        @db.VarChar(100)
+  role_id                                                                     Int?
+  st_penjual                                                                  String?                       @db.VarChar(10)
+  uuiduser                                                                    String                        @id @default(dbgenerated("gen_random_uuid()")) @db.VarChar(100)
+  createdate                                                                  DateTime?                     @default(now()) @db.Timestamp(6)
+  usercreate                                                                  String?                       @db.VarChar(100)
+  userupdate                                                                  String?                       @db.VarChar(100)
+  gender                                                                      String?                       @db.VarChar(10)
+  st_active                                                                   String?                       @db.VarChar(10)
+  token                                                                       String?                       @unique(map: "uq_token") @db.VarChar(15)
+  st_bayar                                                                    String?                       @db.VarChar(10)
+  tgl_jatuh_tempo_bayar                                                       DateTime?                     @db.Date
+  akun_ig                                                                     String?                       @db.VarChar(50)
+  kode_fakultas                                                               String?                       @db.VarChar(30)
+  kode_prodi                                                                  String?                       @db.VarChar(30)
+  kode_univ                                                                   String?                       @db.VarChar(30)
+  no_hp                                                                       String?                       @db.VarChar(30)
+  nama_perusahaan                                                             String?                       @db.VarChar(100)
+  updatedate                                                                  DateTime?                     @db.Timestamp(6)
+  st_follow_ig                                                                String?                       @db.VarChar(5)
+  angkatan                                                                    String?                       @db.VarChar(10)
+  d_portofolio                                                                d_portofolio[]
+  f_undangan_kerjasama_f_undangan_kerjasama_uuiduserdiundangTouser_pengguna   f_undangan_kerjasama[]        @relation("f_undangan_kerjasama_uuiduserdiundangTouser_pengguna")
+  f_undangan_kerjasama_f_undangan_kerjasama_uuiduserpengundangTouser_pengguna f_undangan_kerjasama[]        @relation("f_undangan_kerjasama_uuiduserpengundangTouser_pengguna")
+  log_favourite_pencari_porto                                                 log_favourite_pencari_porto[]
+  ulasan_user                                                                 ulasan_user[]
+  d_angkatan                                                                  d_angkatan?                   @relation(fields: [angkatan], references: [id_angkatan], onDelete: NoAction, onUpdate: NoAction, map: "fk_angkatan")
+  d_fakultas                                                                  d_fakultas?                   @relation(fields: [kode_fakultas], references: [kode_fakultas], onDelete: NoAction, onUpdate: NoAction, map: "fk_fakultas")
+  d_prodi                                                                     d_prodi?                      @relation(fields: [kode_prodi], references: [kode_prodi], onDelete: NoAction, onUpdate: NoAction, map: "fk_prodi")
+  d_univ                                                                      d_univ?                       @relation(fields: [kode_univ], references: [kode_univ], onDelete: NoAction, onUpdate: NoAction, map: "fk_univ")
+  user_pengguna_role                                                          user_pengguna_role?           @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_role")
+}
+
+model user_pengguna_role {
+  id            Int             @id @default(autoincrement())
+  kode          String?         @unique(map: "uq_user_pengguna_role") @db.VarChar(10)
+  nama          String?         @db.VarChar(50)
+  user_pengguna user_pengguna[]
+}
+
+model f_klik_pengunjung_log {
+  id_log       Int          @id @default(autoincrement())
+  uuidporto    String
+  ip_address   String?      @db.VarChar(50)
+  createdate   DateTime?    @default(now())
+  userklik     String?
+  inc_klik     Int?
+  d_portofolio d_portofolio @relation(fields: [uuidporto], references: [uuidporto])
+}
+
+model d_divisi_bem {
+  id_div_bem   Int     @id
+  nama_div_bem String? @db.VarChar(50)
+  deskripsi    String? @db.VarChar(700)
+  kode_div_bem String? @db.Char(20)
+}
+
+model d_fakultas {
+  id_fakultas   Int             @id @default(autoincrement())
+  kode_fakultas String?         @unique(map: "uq_fakultas") @db.VarChar(30)
+  nama_fakultas String?         @db.VarChar(100)
+  kode_univ     String?         @db.VarChar(30)
+  d_univ        d_univ?         @relation(fields: [kode_univ], references: [kode_univ], onDelete: NoAction, onUpdate: NoAction, map: "fk_kode_univ")
+  d_prodi       d_prodi[]
+  user_pengguna user_pengguna[]
+}
+
+model d_kategori_portofolio {
+  id_kat_porto        Int            @id @default(autoincrement())
+  nama_kategori_porto String?        @db.VarChar(100)
+  deskripsi           String?        @db.VarChar(400)
+  d_portofolio        d_portofolio[]
+}
+
+model d_portofolio {
+  uuidporto                 String                      @id(map: "pk_porto") @default(dbgenerated("gen_random_uuid()")) @db.VarChar(100)
+  nama_porto                String                      @db.VarChar(100)
+  keterangan                String?                     @db.VarChar(500)
+  uuiduser                  String                      @db.VarChar(100)
+  filename                  String                      @db.VarChar(300)
+  mimetype                  String?                     @db.VarChar(100)
+  jml_klik                  Int?
+  thumbnail_filename        String                      @db.VarChar(300)
+  createdate                DateTime?                   @default(now()) @db.Timestamp(6)
+  updatedate                DateTime?                   @db.Timestamp(6)
+  id_kat_porto              Int?
+  jml_halaman               Int?
+  d_kategori_portofolio     d_kategori_portofolio?      @relation(fields: [id_kat_porto], references: [id_kat_porto], onDelete: NoAction, onUpdate: NoAction, map: "fk_kat_porto")
+  user_pengguna             user_pengguna               @relation(fields: [uuiduser], references: [uuiduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_porto")
+  f_favourite_pencari_porto f_favourite_pencari_porto[]
+  f_klik_pengunjung_log     f_klik_pengunjung_log[]
+
+  @@index([id_kat_porto], map: "idx_id_kat_porto_porto")
+  @@index([uuidporto], map: "idx_uuidporto_porto")
+  @@index([uuiduser], map: "idx_porto_uuiduser")
+}
+
+model d_prodi {
+  id_prodi      Int             @id @default(autoincrement())
+  kode_prodi    String?         @unique(map: "uq_kode_prodi") @db.VarChar(30)
+  nama_prodi    String?         @db.VarChar(50)
+  kode_univ     String?         @db.VarChar(30)
+  kode_fakultas String?         @db.VarChar(30)
+  d_fakultas    d_fakultas?     @relation(fields: [kode_fakultas], references: [kode_fakultas], onDelete: NoAction, onUpdate: NoAction, map: "fk_kode_fakultas_prodi")
+  d_univ        d_univ?         @relation(fields: [kode_univ], references: [kode_univ], onDelete: NoAction, onUpdate: NoAction, map: "fk_univ_prodi")
+  user_pengguna user_pengguna[]
+}
+
+model d_univ {
+  id_univ       Int             @id(map: "d_kampus_pkey") @default(autoincrement())
+  nama_univ     String?         @db.VarChar(100)
+  kode_univ     String?         @unique(map: "uq_kode_univ") @db.VarChar(30)
+  deskripsi     String?         @db.VarChar(400)
+  d_fakultas    d_fakultas[]
+  d_prodi       d_prodi[]
+  user_pengguna user_pengguna[]
+}
+
+model ulasan_user {
+  uuidulasan      String        @id @default(dbgenerated("gen_random_uuid()"))
+  uuiduserulas    String
+  uuidporto       String
+  rating          Int
+  ulasan          String        @db.VarChar(400)
+  createdate      DateTime      @default(now())
+  updatedate      DateTime?
+  st_view         String?       @db.VarChar(3)
+  uuiduserpemilik String?       @db.VarChar
+  user_pengguna   user_pengguna @relation(fields: [uuiduserulas], references: [uuiduser])
+}
+
+model f_favourite_pencari_porto {
+  uuidfav              String                @id(map: "f_favourite_pencari_kos_pkey") @default(dbgenerated("gen_random_uuid()"))
+  uuiduserfav          String
+  uuidporto            String?
+  createdate           DateTime              @default(now())
+  updatedate           DateTime?
+  usercreate           String?
+  userupdate           String?
+  st_view              String?               @db.VarChar(3)
+  uuiduserpemilik      String?
+  jenis_notif          String?               @db.VarChar(10)
+  id_undangan          Int?
+  d_portofolio         d_portofolio?         @relation(fields: [uuidporto], references: [uuidporto], onDelete: Restrict, map: "f_favourite_pencari_kos_uuidporto_fkey")
+  f_undangan_kerjasama f_undangan_kerjasama? @relation(fields: [id_undangan], references: [id_undangan], onDelete: NoAction, onUpdate: NoAction, map: "fk_id_undangan")
+}
+
+model log_favourite_pencari_porto {
+  uuidfav         String        @id
+  uuiduserfav     String
+  uuidporto       String?
+  createdate      DateTime?
+  updatedate      DateTime?
+  usercreate      String?
+  userupdate      String?
+  st_view         String?       @db.VarChar(3)
+  uuiduserpemilik String
+  jenis_notif     String?       @db.VarChar(10)
+  id_undangan     Int?
+  user_pengguna   user_pengguna @relation(fields: [uuiduserfav], references: [uuiduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_uuiduser_log_fav")
+}
+
+model d_jenis_kerjasama {
+  id_jenis_kerjasama   Int                    @id
+  nama_jenis_kerjasama String?                @db.VarChar(100)
+  keterangan           String?                @db.VarChar(100)
+  f_undangan_kerjasama f_undangan_kerjasama[]
+}
+
+model f_undangan_kerjasama {
+  id_undangan                                                          Int                         @id
+  id_jenis_kerjasama                                                   Int
+  keterangan                                                           String                      @db.VarChar(500)
+  uuiduserpengundang                                                   String                      @db.VarChar(100)
+  uuiduserdiundang                                                     String                      @db.VarChar(100)
+  st_konfirmasi                                                        String?                     @db.VarChar(5)
+  updatedate                                                           DateTime?                   @db.Timestamp(6)
+  createdate                                                           DateTime?                   @default(now()) @db.Timestamp(6)
+  updateuser                                                           String?                     @db.VarChar(100)
+  kontak_yg_diberikan                                                  String?                     @db.VarChar(10)
+  uuidporto                                                            String?                     @db.VarChar(100)
+  f_favourite_pencari_porto                                            f_favourite_pencari_porto[]
+  d_jenis_kerjasama                                                    d_jenis_kerjasama           @relation(fields: [id_jenis_kerjasama], references: [id_jenis_kerjasama], onDelete: NoAction, onUpdate: NoAction, map: "fk_jenis_kerjasama")
+  user_pengguna_f_undangan_kerjasama_uuiduserdiundangTouser_pengguna   user_pengguna               @relation("f_undangan_kerjasama_uuiduserdiundangTouser_pengguna", fields: [uuiduserdiundang], references: [uuiduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_diundang")
+  user_pengguna_f_undangan_kerjasama_uuiduserpengundangTouser_pengguna user_pengguna               @relation("f_undangan_kerjasama_uuiduserpengundangTouser_pengguna", fields: [uuiduserpengundang], references: [uuiduser], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_pengundang")
+}
+
+model f_klik_pengunjung_promosi_log {
+  id_log        Int                 @id @default(autoincrement())
+  id_promosi    Int
+  ip_address    String?             @db.VarChar(50)
+  createdate    DateTime?           @default(now())
+  userklik      String?
+  inc_klik      Int?
+  d_promosi_mhs d_promosi_mahasiswa @relation(fields: [id_promosi], references: [id_promosi])
+}
+
+model d_angkatan {
+  id_angkatan    String          @id @db.VarChar(10)
+  tahun_angkatan String?         @db.VarChar(10)
+  user_pengguna  user_pengguna[]
+}
+
+model d_kategori_promosi {
+  id_kat_promosi        Int                   @id @default(autoincrement())
+  nama_kategori_promosi String?               @db.VarChar(100)
+  keterangan            String?               @db.VarChar(200)
+  d_promosi_mahasiswa   d_promosi_mahasiswa[]
+}
+
+model d_promosi_mahasiswa {
+  id_promosi                    Int                             @id(map: "d_promosi_mhs_pkey") @default(autoincrement())
+  filename                      String?                         @db.VarChar(300)
+  mimetype                      String?                         @db.VarChar(100)
+  keterangan                    String?                         @db.VarChar(400)
+  uuiduser                      String?                         @db.VarChar(100)
+  link                          String?                         @db.VarChar(400)
+  jml_klik                      Int?
+  nama_promosi                  String?                         @db.VarChar(100)
+  id_kat_promosi                Int?
+  createdate                    DateTime?                       @default(now()) @db.Timestamp(6)
+  updatedate                    DateTime?                       @db.Timestamp(6)
+  d_kategori_promosi            d_kategori_promosi?             @relation(fields: [id_kat_promosi], references: [id_kat_promosi], onDelete: NoAction, onUpdate: NoAction, map: "id_kat_promosi_fk")
+  f_klik_pengunjung_promosi_log f_klik_pengunjung_promosi_log[]
+
+  @@index([id_kat_promosi], map: "idx_id_kat_promosi_promosi")
+}

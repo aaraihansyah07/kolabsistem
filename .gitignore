@@ -1,0 +1,61 @@
+node_modules
+# Keep environment variables out of version control
+
+# ALTER TABLE d_kosan ALTER COLUMN uuidkosan SET DEFAULT gen_random_uuid();
+# ALTER TABLE d_ruangan_kosan ALTER COLUMN uuidruangankosan SET DEFAULT gen_random_uuid();
+# ALTER TABLE users ALTER COLUMN uuiduser SET DEFAULT gen_random_uuid();
+
+# CREATE OR REPLACE FUNCTION insert_to_d_kosan()
+# RETURNS TRIGGER AS $$
+# BEGIN
+#     -- Menyisipkan data ke tabel d_kosan jika role_id = 1
+#     IF NEW.role_id = 1 THEN
+#         INSERT INTO d_kosan (uuiduser, nama_kosan, alamat_kosan_lengkap, tipe_kosan, kode_provinsi, kode_kota, st_active)
+#         VALUES (NEW.uuiduser, NEW.nama_kosan, NEW.alamat_kosan_lengkap, NEW.tipe_kosan, NEW.kode_provinsi, NEW.kode_kota, 'Y');
+#     END IF;
+#     RETURN NEW;
+# END;
+# $$ LANGUAGE plpgsql;
+
+# -- Membuat trigger untuk tabel users
+# CREATE TRIGGER after_insert_users
+# AFTER INSERT ON users
+# FOR EACH ROW
+# EXECUTE FUNCTION insert_to_d_kosan();
+
+# --Membuat trigger untuk table f_favourite_pencari_kos
+# CREATE OR REPLACE FUNCTION log_favourite_pencari_kos_trigger_func()
+# RETURNS TRIGGER AS $$
+# BEGIN
+#   INSERT INTO log_favourite_pencari_kos (
+#     uuidfav,
+#     uuiduserfav,
+#     uuidruangankosan,
+#     createdate,
+#     updatedate,
+#     usercreate,
+#     userupdate,
+#     uuiduserpemilik
+#   )
+#   VALUES (
+#     NEW.uuidfav,
+#     NEW.uuiduserfav,
+#     NEW.uuidruangankosan,
+#     NEW.createdate,
+#     NEW.updatedate,
+#     NEW.usercreate,
+#     NEW.userupdate,
+#     NEW.uuiduserpemilik
+#   );
+
+#   RETURN NEW;
+# END;
+# $$ LANGUAGE plpgsql;
+
+# --functionnya
+# CREATE TRIGGER trg_log_favourite_pencari_kos
+# AFTER INSERT ON f_favourite_pencari_kos
+# FOR EACH ROW
+# EXECUTE FUNCTION log_favourite_pencari_kos_trigger_func();
+
+#link app password : https://myaccount.google.com/apppasswords
